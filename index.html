@@ -88,9 +88,14 @@
                     <strong>每日其他经验</strong>（生长周期外）：除虫草 1500、放虫草 1000、种植 1000、铲地 600，共 4100/日。
                 </div>
                 <div class="input-group">
-                    <label class="input-label">升到下一级还需经验（选填）</label>
+                    <label class="input-label">升级预估（选填，填两项后自动算「还需多少」）</label>
                     <div class="input-wrapper">
-                        <input type="number" id="inputExpToNext" min="0" step="1" placeholder="游戏内可见，不填则不显示升级预估" class="clay-input">
+                        <input type="number" id="inputCurrentExp" min="0" step="1" placeholder="当前经验" class="clay-input" title="游戏里你当前已有的经验值">
+                        <span class="input-hint">当前经验</span>
+                    </div>
+                    <div class="input-wrapper" style="margin-top:8px;">
+                        <input type="number" id="inputExpRequiredForNext" min="0" step="1" placeholder="升到下一级所需总经验" class="clay-input" title="游戏里升到下一级的经验线（等级条上的那个数字）">
+                        <span class="input-hint">升到下一级所需总经验（等级条上的线）</span>
                     </div>
                 </div>
                 <div class="strategy-tip">

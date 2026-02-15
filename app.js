@@ -427,13 +427,15 @@ function calculate() {
         document.getElementById('dailyTotalExp').textContent = dailyTotal.toLocaleString();
         const harvestOnce = lands * (row.exp || 0);
         document.getElementById('harvestOnceExp').textContent = harvestOnce.toLocaleString() + '（' + lands + ' 块 × ' + (row.exp || 0) + '）';
-        const expToNext = parseInt(document.getElementById('inputExpToNext').value, 10);
+        const expToNext = getExpToNextFromInputs();
         if (Number.isFinite(expToNext) && expToNext > 0) {
             const harvestsToUp = harvestOnce > 0 ? Math.ceil(expToNext / harvestOnce) : '-';
             const daysToUp = dailyTotal > 0 ? (Math.ceil(expToNext / dailyTotal) + ' 天') : '-';
             document.getElementById('upgradeEstimate').textContent = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
+        } else if (Number.isFinite(expToNext) && expToNext === 0) {
+            document.getElementById('upgradeEstimate').textContent = '已到升级线，可升级';
         } else {
-            document.getElementById('upgradeEstimate').textContent = '填写「升到下一级还需经验」后显示';
+            document.getElementById('upgradeEstimate').textContent = '填写「当前经验」和「升到下一级所需总经验」后显示';
         }
     }
     fillDailyCard(dailyTop3[0]);
@@ -621,14 +623,24 @@ function updateDailyByRank() {
     document.getElementById('dailyTotalExp').textContent = dailyTotal.toLocaleString();
     const harvestOnce = lands * (row.exp || 0);
     document.getElementById('harvestOnceExp').textContent = harvestOnce.toLocaleString() + '（' + lands + ' 块 × ' + (row.exp || 0) + '）';
-    const expToNext = parseInt(document.getElementById('inputExpToNext').value, 10);
+    const expToNext = getExpToNextFromInputs();
     if (Number.isFinite(expToNext) && expToNext > 0) {
         const harvestsToUp = harvestOnce > 0 ? Math.ceil(expToNext / harvestOnce) : '-';
         const daysToUp = dailyTotal > 0 ? (Math.ceil(expToNext / dailyTotal) + ' 天') : '-';
         document.getElementById('upgradeEstimate').textContent = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
+    } else if (Number.isFinite(expToNext) && expToNext === 0) {
+        document.getElementById('upgradeEstimate').textContent = '已到升级线，可升级';
     } else {
-        document.getElementById('upgradeEstimate').textContent = '填写「升到下一级还需经验」后显示';
+        document.getElementById('upgradeEstimate').textContent = '填写「当前经验」和「升到下一级所需总经验」后显示';
     }
+}
+
+// 根据「当前经验」和「升到下一级所需总经验」计算还需多少经验
+function getExpToNextFromInputs() {
+    const current = parseInt(document.getElementById('inputCurrentExp') && document.getElementById('inputCurrentExp').value, 10);
+    const required = parseInt(document.getElementById('inputExpRequiredForNext') && document.getElementById('inputExpRequiredForNext').value, 10);
+    if (!Number.isFinite(current) || !Number.isFinite(required)) return NaN;
+    return Math.max(0, required - current);
 }
 
 // ========== 化肥续航计算 ==========
