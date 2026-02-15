@@ -1,0 +1,16 @@
+node_modules
+android
+.git
+*.bat
+*.ps1
+.cursor
+.idea
+.vscode
+.windsurf
+README.md
+LICENSE
+.gitignore
+calc-exp-yield.js
+ANDROID_BUILD.md
+*.md
+*.log

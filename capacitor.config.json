@@ -1,0 +1,8 @@
+{
+  "appId": "com.farmcalc.app",
+  "appName": "农场经验计算器",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  }
+}
