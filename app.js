@@ -428,15 +428,16 @@ function calculate() {
         const harvestOnce = lands * (row.exp || 0);
         document.getElementById('harvestOnceExp').textContent = harvestOnce.toLocaleString() + '（' + lands + ' 块 × ' + (row.exp || 0) + '）';
         const expToNext = getExpToNextFromInputs();
+        const elUpgrade = document.getElementById('upgradeEstimate');
+        let upgradeText = '填写「当前经验」和「升到下一级所需总经验」后显示';
         if (Number.isFinite(expToNext) && expToNext > 0) {
             const harvestsToUp = harvestOnce > 0 ? Math.ceil(expToNext / harvestOnce) : '-';
             const daysToUp = dailyTotal > 0 ? (Math.ceil(expToNext / dailyTotal) + ' 天') : '-';
-            document.getElementById('upgradeEstimate').textContent = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
+            upgradeText = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
         } else if (Number.isFinite(expToNext) && expToNext === 0) {
-            document.getElementById('upgradeEstimate').textContent = '已到升级线，可升级';
-        } else {
-            document.getElementById('upgradeEstimate').textContent = '填写「当前经验」和「升到下一级所需总经验」后显示';
+            upgradeText = '已到升级线，可升级';
         }
+        if (elUpgrade) elUpgrade.textContent = upgradeText;
     }
     fillDailyCard(dailyTop3[0]);
 
@@ -624,23 +625,39 @@ function updateDailyByRank() {
     const harvestOnce = lands * (row.exp || 0);
     document.getElementById('harvestOnceExp').textContent = harvestOnce.toLocaleString() + '（' + lands + ' 块 × ' + (row.exp || 0) + '）';
     const expToNext = getExpToNextFromInputs();
+    const elUpgrade = document.getElementById('upgradeEstimate');
+    let upgradeText = '填写「当前经验」和「升到下一级所需总经验」后显示';
     if (Number.isFinite(expToNext) && expToNext > 0) {
         const harvestsToUp = harvestOnce > 0 ? Math.ceil(expToNext / harvestOnce) : '-';
         const daysToUp = dailyTotal > 0 ? (Math.ceil(expToNext / dailyTotal) + ' 天') : '-';
-        document.getElementById('upgradeEstimate').textContent = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
+        upgradeText = '约再收获 ' + harvestsToUp + ' 次可升级，约 ' + daysToUp + ' 可升级';
     } else if (Number.isFinite(expToNext) && expToNext === 0) {
-        document.getElementById('upgradeEstimate').textContent = '已到升级线，可升级';
-    } else {
-        document.getElementById('upgradeEstimate').textContent = '填写「当前经验」和「升到下一级所需总经验」后显示';
+        upgradeText = '已到升级线，可升级';
     }
+    if (elUpgrade) elUpgrade.textContent = upgradeText;
+}
+
+// 解析数字输入（支持带逗号、空格的粘贴，如 12,500）
+function parseExpInput(el) {
+    if (!el || !el.value || String(el.value).trim() === '') return NaN;
+    const num = parseInt(String(el.value).replace(/[\s,，]/g, ''), 10);
+    return Number.isFinite(num) ? num : NaN;
 }
 
 // 根据「当前经验」和「升到下一级所需总经验」计算还需多少经验
+// 若第二框填的是「还需经验」而非总经验线，也支持：当 所需总经验 <= 当前经验 时按「还需」处理
 function getExpToNextFromInputs() {
-    const current = parseInt(document.getElementById('inputCurrentExp') && document.getElementById('inputCurrentExp').value, 10);
-    const required = parseInt(document.getElementById('inputExpRequiredForNext') && document.getElementById('inputExpRequiredForNext').value, 10);
+    const elCurrent = document.getElementById('inputCurrentExp');
+    const elRequired = document.getElementById('inputExpRequiredForNext');
+    const current = parseExpInput(elCurrent);
+    const required = parseExpInput(elRequired);
+
+    if (Number.isFinite(required) && !Number.isFinite(current)) {
+        return required >= 0 ? required : NaN;
+    }
     if (!Number.isFinite(current) || !Number.isFinite(required)) return NaN;
-    return Math.max(0, required - current);
+    if (required > current) return required - current;
+    return Math.max(0, required);
 }
 
 // ========== 化肥续航计算 ==========
