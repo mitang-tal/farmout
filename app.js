@@ -645,19 +645,20 @@ function parseExpInput(el) {
 }
 
 // 根据「当前经验」和「升到下一级所需总经验」计算还需多少经验
-// 若第二框填的是「还需经验」而非总经验线，也支持：当 所需总经验 <= 当前经验 时按「还需」处理
+// 两个都填时：自动把较小的当当前经验、较大的当下一级线，还需 = 大 - 小（填反也能算对）
+// 只填一个时：当作「还需经验」使用
 function getExpToNextFromInputs() {
     const elCurrent = document.getElementById('inputCurrentExp');
     const elRequired = document.getElementById('inputExpRequiredForNext');
-    const current = parseExpInput(elCurrent);
-    const required = parseExpInput(elRequired);
+    const a = parseExpInput(elCurrent);
+    const b = parseExpInput(elRequired);
 
-    if (Number.isFinite(required) && !Number.isFinite(current)) {
-        return required >= 0 ? required : NaN;
-    }
-    if (!Number.isFinite(current) || !Number.isFinite(required)) return NaN;
-    if (required > current) return required - current;
-    return Math.max(0, required);
+    if (Number.isFinite(a) && !Number.isFinite(b)) return a >= 0 ? a : NaN;
+    if (!Number.isFinite(a) && Number.isFinite(b)) return b >= 0 ? b : NaN;
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return NaN;
+    const current = Math.min(a, b);
+    const required = Math.max(a, b);
+    return Math.max(0, required - current);
 }
 
 // ========== 化肥续航计算 ==========
