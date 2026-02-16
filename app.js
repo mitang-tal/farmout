@@ -733,11 +733,18 @@ function calcFertDuration() {
     }
     document.getElementById('fertInorganicResult').textContent = inorganicText;
 
+    // 有机肥按阶段使用：每使用一次从桶里扣除「该阶段时长」（如火绒草每阶段 96 分钟），每轮会用 N 次（N=剩余阶段数）
+    const phaseSec = phasesAfterNormal.length > 0 ? phasesAfterNormal[0] : 0;
+    const phaseMin = phaseSec ? Math.round(phaseSec / 60) : 0;
+    const perUseDesc = phaseMin >= 60 ? `${Math.floor(phaseMin / 60)}小时${phaseMin % 60}分` : (phaseMin ? `${phaseMin}分钟` : '');
     let organicText = organicStr + ' 内约可完成 ';
     if (hoursOrganic > 0 && organicConsumePerRound > 0) {
         const bucketOrganicSec = hoursOrganic * 3600;
         const roundsOrganic = Math.floor(bucketOrganicSec / organicConsumePerRound);
-        organicText += roundsOrganic + ' 轮，每轮约 ' + formatDuration(cycleOrganicSec);
+        organicText += roundsOrganic + ' 轮，每轮实时约 ' + formatDuration(cycleFertSec);
+        if (organicResult.useCount > 0 && perUseDesc) {
+            organicText += '（每轮用有机肥 ' + organicResult.useCount + ' 次，每次扣 ' + perUseDesc + '）';
+        }
     } else if (hoursOrganic > 0) {
         organicText += '- 轮（该作物无阶段数据）';
     } else {
